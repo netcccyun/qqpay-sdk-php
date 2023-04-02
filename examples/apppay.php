@@ -24,8 +24,7 @@ $params = [
 try {
     $client = new \QQPay\PaymentService($qqpay_config);
     $result = $client->appPay($params);
-    $prepay_id = $result['prepay_id'];
-    echo $prepay_id;
+    print_r($result);
 } catch (Exception $e) {
     echo 'QQ钱包支付下单失败！'.$e->getMessage();
 }

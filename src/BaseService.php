@@ -13,6 +13,9 @@ class BaseService
     //应用APPID（可空）
     protected $appId;
 
+    //应用APPKEY（可空）
+    protected $appKey;
+
     //商户证书路径
     protected $sslCertPath;
 
@@ -41,7 +44,12 @@ class BaseService
         }
         $this->mchId = $config['mchid'];
         $this->apiKey = $config['apikey'];
-        $this->appId = $config['appid'];
+        if (isset($config['appid'])) {
+            $this->appId = $config['appid'];
+        }
+        if (isset($config['appkey'])) {
+            $this->appKey = $config['appkey'];
+        }
         $this->sslCertPath = $config['sslcert_path'];
         $this->sslKeyPath = $config['sslkey_path'];
         if (isset($config['op_userid'])) {

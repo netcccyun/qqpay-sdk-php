@@ -24,13 +24,12 @@ $params = [
 try {
     $client = new \QQPay\PaymentService($qqpay_config);
     $result = $client->jsapiPay($params);
-    $prepay_id = $result['prepay_id'];
+    $tokenId = $result['tokenId'];
+    $appInfo = $result['appInfo'];
 } catch (Exception $e) {
     echo 'QQ钱包支付下单失败！'.$e->getMessage();
     exit;
 }
-$mchappid = $qqpay_config['appid'];
-$mchid = $qqpay_config['mchid'];
 ?>
 <!DOCTYPE html>
 <html>
@@ -57,8 +56,8 @@ $mchid = $qqpay_config['mchid'];
 	function callpay()
 	{
 		mqq.tenpay.pay({
-			tokenId: '<?php echo $prepay_id; ?>',
-			appInfo: "appid#<?php echo $mchappid;?>|bargainor_id#<?php echo $mchid;?>|channel#wallet"
+			tokenId: '<?php echo $tokenId; ?>',
+			appInfo: '<?php echo $appInfo; ?>'
 		}, function(result, resultCode){
 			if(result.resultCode == 0){ //支付成功
 				alert('支付成功')

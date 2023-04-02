@@ -55,23 +55,62 @@ class PaymentService extends BaseService
     /**
      * JSAPI支付
      * @param $params 下单参数
-     * @return mixed {"prepay_id":"预支付会话标识"}
+     * @return mixed {"tokenId":"预支付会话标识","appInfo":"标记业务及渠道"}
      */
     public function jsapiPay($params)
     {
         $params['trade_type'] = 'JSAPI';
-        return $this->unifiedOrder($params);
+        $result = $this->unifiedOrder($params);
+        return ['tokenId' => $result['prepay_id'], 'appInfo' => 'appid#' . $this->appId . '|bargainor_id#' . $this->mchId . '|channel#wallet'];
     }
 
     /**
      * APP支付
      * @param $params 下单参数
-     * @return mixed {"prepay_id":"预支付会话标识"}
+     * @return mixed APP支付json数据
      */
     public function appPay($params)
     {
         $params['trade_type'] = 'APP';
-        return $this->unifiedOrder($params);
+        $result = $this->unifiedOrder($params);
+        return $this->getAppParameters($result['prepay_id']);
+    }
+
+    /**
+     * 获取APP支付的参数
+     * @param $prepay_id 预支付交易会话标识
+     * @return array
+     */
+    private function getAppParameters($prepay_id)
+    {
+        $params = [
+            'appId' => $this->appId,
+            'nonce' => $this->getNonceStr(),
+            'tokenId' => $prepay_id,
+            'pubAcc' => '',
+            'bargainorId' => $this->mchId,
+        ];
+        $params['sig'] = $this->makeAppSign($params);
+        $params['sigType'] = 'HMAC-SHA1';
+        $params['timeStamp'] = time();
+        return $params;
+    }
+
+    /**
+     * 生成APP支付签名
+     * @param $data
+     * @return string
+     */
+    private function makeAppSign()
+    {
+        ksort($data);
+        $signStr = '';
+        foreach ($data as $k => $v) {
+            $signStr .= $k . '=' . $v . '&';
+        }
+        $signStr = trim($signStr, '&');
+        $sign = base64_encode(hash_hmac("sha1", $signStr, $this->appKey.'&', true));
+        return $sign;
     }
 
     /**
