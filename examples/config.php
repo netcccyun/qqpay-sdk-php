@@ -15,9 +15,14 @@ $qqpay_config = [
     'apikey' => '',
 
     /**
-     * 应用APPID（可空）
+     * 应用APPID（仅APP支付需要）
      */
     'appid' => '',
+
+    /**
+     * 应用APPKEY（仅APP支付需要）
+     */
+    'appkey' => '',
 
     /**
      * 操作员账号（仅退款、撤销订单、企业付款时需要）
