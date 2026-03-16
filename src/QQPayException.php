@@ -8,6 +8,7 @@ namespace QQPay;
 class QQPayException extends \Exception
 {
     private $res = [];
+    private $errCode;
 
     /**
      * @param array $res
@@ -16,6 +17,7 @@ class QQPayException extends \Exception
     {
         $this->res = $res;
         if (isset($res['err_code'])) {
+            $this->errCode = $res['err_code'];
             $message = '['.$res['err_code'].']'.$res['err_code_des'];
         } elseif (isset($res['return_code'])) {
             $message = '['.$res['return_code'].']'.$res['return_msg'];
@@ -28,5 +30,10 @@ class QQPayException extends \Exception
     public function getResponse()
     {
         return $this->res;
+    }
+
+    public function getErrCode()
+    {
+        return $this->errCode;
     }
 }
