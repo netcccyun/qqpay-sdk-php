@@ -101,7 +101,7 @@ class PaymentService extends BaseService
      * @param $data
      * @return string
      */
-    private function makeAppSign()
+    private function makeAppSign($data)
     {
         ksort($data);
         $signStr = '';
@@ -147,7 +147,7 @@ class PaymentService extends BaseService
         $params = [
             'out_trade_no' => $out_trade_no,
             'op_user_id' => $this->opUserId,
-            'op_user_passwd' => md5($this->opUserPwd)
+            'op_user_passwd' => md5((string)$this->opUserPwd)
         ];
         return $this->execute($url, $params, true);
     }
@@ -179,7 +179,8 @@ class PaymentService extends BaseService
     {
         try {
             $data = $this->orderQuery($transaction_id);
-            return $data['trade_state'] == 'SUCCESS' || $data['trade_state'] == 'REFUND';
+            $trade_state = $data['trade_state'] ?? '';
+            return $trade_state == 'SUCCESS' || $trade_state == 'REFUND';
         } catch (\Exception $e) {
             return false;
         }
@@ -218,7 +219,7 @@ class PaymentService extends BaseService
         }
         $params += [
             'op_user_id' => $this->opUserId,
-            'op_user_passwd' => md5($this->opUserPwd)
+            'op_user_passwd' => md5((string)$this->opUserPwd)
         ];
         return $this->execute($url, $params, true);
     }

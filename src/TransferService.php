@@ -45,8 +45,8 @@ class TransferService extends BaseService
         }
         $params += [
             'op_user_id' => $this->opUserId,
-            'op_user_passwd' => md5($this->opUserPwd),
-            'spbill_create_ip' => $_SERVER['SERVER_ADDR']
+            'op_user_passwd' => md5((string)$this->opUserPwd),
+            'spbill_create_ip' => $_SERVER['SERVER_ADDR'] ?? '127.0.0.1'
         ];
         return $this->execute($url, $params, true);
     }

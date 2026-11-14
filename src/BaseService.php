@@ -50,8 +50,8 @@ class BaseService
         if (isset($config['appkey'])) {
             $this->appKey = $config['appkey'];
         }
-        $this->sslCertPath = $config['sslcert_path'];
-        $this->sslKeyPath = $config['sslkey_path'];
+        $this->sslCertPath = $config['sslcert_path'] ?? null;
+        $this->sslKeyPath = $config['sslkey_path'] ?? null;
         if (isset($config['op_userid'])) {
             $this->opUserId = $config['op_userid'];
         }
@@ -109,11 +109,11 @@ class BaseService
      */
     protected function checkSign($data)
     {
-        if (!isset($data['sign'])) return false;
+        if (!isset($data['sign']) || !is_string($data['sign'])) return false;
 
         $sign = $this->makeSign($data);
 
-        return $sign === $data['sign'];
+        return hash_equals($sign, $data['sign']);
     }
 
     /**
@@ -174,7 +174,12 @@ class BaseService
         }
         $xml = '<xml>';
         foreach ($data as $key => $val) {
-            $xml .= (is_numeric($val) ? "<{$key}>{$val}</{$key}>" : "<{$key}><![CDATA[{$val}]]></{$key}>");
+            if (is_numeric($val)) {
+                $xml .= "<{$key}>{$val}</{$key}>";
+            } else {
+                $val = str_replace(']]>', ']]]]><![CDATA[>', (string)$val);
+                $xml .= "<{$key}><![CDATA[{$val}]]></{$key}>";
+            }
         }
         return $xml . '</xml>';
     }
@@ -229,10 +234,8 @@ class BaseService
         $data = curl_exec($ch);
         if (curl_errno($ch) > 0) {
             $errmsg = curl_error($ch);
-            curl_close($ch);
             throw new \Exception($errmsg, 0);
         }
-        curl_close($ch);
         return $data;
     }
 }
